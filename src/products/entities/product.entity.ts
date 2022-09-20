@@ -15,7 +15,7 @@ export class Product {
   })
   title: string;
 
-  @Column('numeric', {
+  @Column('float', {
     default: 0,
   }) // prestar atencion que si se elige number como tipo de dato, la db no acepta este tipo usando postgres
   price: number;
