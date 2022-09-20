@@ -3,12 +3,15 @@
 </p>
 
 # Teslo API
-  ```
-1. Levantar la base de datos
+
+1. Clonar proyecto
+2. Instalar dependencias `yarn install`
+3. Clonar `.env.template` y renombrarlo como `.env`
+4. Modificar las variables de entorno
+5. Levantar la base de datos
 ```
 docker-compose up -d
 ```
-
 6. Ejecutad SEED
 ```
   http://localhost:3000/api/seed
@@ -16,4 +19,3 @@ docker-compose up -d
 
 7. Levantar el ambiente de desarrollo con 
   ```
-  yarn start:dev
