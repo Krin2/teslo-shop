@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -7,11 +7,14 @@ import { Product } from './entities/product.entity';
 
 @Injectable()
 export class ProductsService {
+  // Nest tiene incorporado una clase Logger que permite mostrar por consola con formato los errores, warning y ayudas
+  private readonly logger = new Logger('ProductsService');
+
   // Buscar mas informacion sobre el patron repositorio
   constructor(
     @InjectRepository(Product)
     private readonly productsRepository: Repository<Product>,
-  ) {}
+  ) { }
 
   async create(createProductDto: CreateProductDto) {
     try {
@@ -19,8 +22,7 @@ export class ProductsService {
       await this.productsRepository.save(product); // guarda el producto en la base de datos (se conecta con la db)
       return product;
     } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException('Ayuda!');
+      this.handleDBExceptios(error);
     }
   }
 
@@ -38,5 +40,15 @@ export class ProductsService {
 
   remove(id: number) {
     return `This action removes a #${id} product`;
+  }
+
+  private handleDBExceptios(error: any) {
+    if (error.code === '23505') {
+      throw new BadRequestException(error.detail);
+    }
+    // el error se ve en consola de color rojo como:
+    // [Nest] 51297  - 09/20/2022, 4:44:56 PM   ERROR [ProductsService] QueryFailedError: duplicate key value violates unique constraint "UQ_f7bf944ad9f1034110e8c2133ab"
+    this.logger.error(error);
+    throw new InternalServerErrorException('Ayuda!');
   }
 }
