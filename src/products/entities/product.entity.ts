@@ -14,4 +14,37 @@ export class Product {
     unique: true,
   })
   title: string;
+
+  @Column('numeric', {
+    default: 0,
+  }) // prestar atencion que si se elige number como tipo de dato, la db no acepta este tipo usando postgres
+  price: number;
+
+  @Column({
+    type: 'text',
+    nullable: true,
+  })
+  description: string;
+
+  @Column('text', {
+    unique: true,
+  })
+  slug: string;
+
+  @Column('int', {
+    default: 0,
+  })
+  stock: number;
+
+  @Column('text', {
+    array: true,
+  })
+  sizes: string[];
+
+  @Column('text')
+  gender: string;
+
+  // TODO:
+  // - images
+  // - otros
 }
