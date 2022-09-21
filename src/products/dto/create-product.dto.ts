@@ -2,6 +2,7 @@ import {
   IsArray,
   IsIn,
   IsInt,
+  IsLowercase,
   IsNumber,
   IsOptional,
   IsPositive,
@@ -24,6 +25,7 @@ export class CreateProductDto {
   description?: string;
 
   @IsString()
+  @IsLowercase()
   @IsOptional()
   slug?: string;
 

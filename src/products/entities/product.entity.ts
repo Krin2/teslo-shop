@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 // La entidad es una representacion de la table dentro de la base de datos.
 // Se debe marcar como Entity() y debe ser importado en el module para que sea tenido en cuenta.
@@ -46,5 +46,15 @@ export class Product {
 
   // TODO:
   // - images
-  // - otros
+  // - tags
+
+  @BeforeInsert()
+  checkSlugInsert() {
+    if (!this.slug) {
+      this.slug = this.title;
+    }
+    this.slug = this.slug.toLowerCase();
+    // .replaceAll(' ', '_') // no esta reconociendo estas funciones incluso despues de cambiar el tsconfig
+    // .replaceAll("'", '');
+  }
 }
