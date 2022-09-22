@@ -1,4 +1,12 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { ProductImage } from './';
 
 // La entidad es una representacion de la table dentro de la base de datos.
 // Se debe marcar como Entity() y debe ser importado en el module para que sea tenido en cuenta.
@@ -44,24 +52,35 @@ export class Product {
   @Column('text')
   gender: string;
 
-  // TODO:
-  // - images
-  // - tags
+  @Column('text', {
+    array: true,
+    default: [],
+  })
+  tags: string[];
+
+  @OneToMany(
+    () => ProductImage, // describe la relacion directa entre esta variable con la tabla ProductImage
+    (productImage: ProductImage) => productImage.product, // Describe la relacion inversa entre la variable producto y la images
+    { cascade: true }, // la opcion cascade hace referencia a que si se elimina un producto, se eliminan las referencias en la otra tabla
+  )
+  images?: ProductImage;
 
   @BeforeInsert()
   checkSlugInsert() {
     if (!this.slug) {
       this.slug = this.title;
     }
-    this.slug = this.slug.toLowerCase();
-    // this.slug = this.slug.replaceAll(' ', '_'); // no esta reconociendo estas funciones incluso despues de cambiar el tsconfig
-    // this.slug = this.slug.replaceAll("'", '');
+    this.slug = this.slug
+      .toLowerCase()
+      .replaceAll(' ', '_') // no esta reconociendo estas funcionesdebido a la version de node
+      .replaceAll("'", '');
   }
 
   @BeforeUpdate()
   checkSlugUpdate() {
-    this.slug = this.slug.toLowerCase();
-    // this.slug = this.slug.replaceAll(' ', '_'); // no esta reconociendo estas funciones incluso despues de cambiar el tsconfig
-    // this.slug = this.slug.replaceAll("'", '');
+    this.slug = this.slug
+      .toLowerCase()
+      .replaceAll(' ', '_')
+      .replaceAll("'", '');
   }
 }
