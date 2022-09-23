@@ -58,12 +58,18 @@ export class Product {
   })
   tags: string[];
 
-  @OneToMany(
-    () => ProductImage, // describe la relacion directa entre esta variable con la tabla ProductImage
-    (productImage: ProductImage) => productImage.product, // Describe la relacion inversa entre la variable producto y la images
-    { cascade: true }, // la opcion cascade hace referencia a que si se elimina un producto, se eliminan las referencias en la otra tabla
-  )
-  images?: ProductImage;
+  // Describe la relacion "uno a muchos" entre el producto y las imagenes.
+  // El primer termino vincula images en Product con ProductImages.
+  // El segundo termino indica la relacion inversa entre ProductImages y Product,
+  // de esta forma, a cada producto se le asignara uno o mas Objetos del tipo ProductImage
+  // Opcionales: cascade. Se usará para hacer cambios que afecten a ambas tablas
+  // Notar que las imagenes son opcionales y vienen en un array de tipo ProductImage.
+  // Noter que no se decoro con @Column porque es una referencia a otra tabla y no una columna en si de la entidad
+  @OneToMany(() => ProductImage, (productImage) => productImage.product, {
+    cascade: true,
+    eager: true, // ver documentacion de typeorm. Hace que el findOne tome las relaciones al usar find*. Para query no sirve
+  })
+  images?: ProductImage[];
 
   @BeforeInsert()
   checkSlugInsert() {
