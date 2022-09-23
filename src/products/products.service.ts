@@ -162,6 +162,19 @@ export class ProductsService {
       throw new NotFoundException(`Product with id ${id} not found`);
   }
 
+  async deleteAllProducts() {
+    const query = this.productsRepository.createQueryBuilder('product'); // crea una consulta a la base de datos
+
+    try {
+      await query
+        .delete() // Borra los datos
+        .where({}) // filtra ninguno (o sea selecciona todos)
+        .execute(); // ejecuta el borrado
+    } catch (error) {
+      this.handleDBExceptios(error);
+    }
+  }
+
   private handleDBExceptios(error: any) {
     if (error.code === '23505') {
       throw new BadRequestException(error.detail);
