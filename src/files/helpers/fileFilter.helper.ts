@@ -1,5 +1,3 @@
-import { MulterOptions } from "@nestjs/platform-express/multer/interfaces/multer-options.interface";
-
 export const fileFilter = (
   req: Express.Request,
   file: Express.Multer.File,
