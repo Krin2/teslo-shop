@@ -10,7 +10,8 @@ import { ProductImage } from './';
 
 // La entidad es una representacion de la table dentro de la base de datos.
 // Se debe marcar como Entity() y debe ser importado en el module para que sea tenido en cuenta.
-@Entity()
+// entre las opciones que hay, el name le da el nombre a la tabla en la base de datos
+@Entity({ name: 'products' })
 export class Product {
   @PrimaryGeneratedColumn('uuid')
   id: string;
