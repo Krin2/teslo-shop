@@ -8,7 +8,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { FilesService } from './files.service';
-import { fileFilter } from './helpers/fileFilter.helper';
+import { fileFilter, fileNamer } from './helpers';
 
 @Controller('files')
 export class FilesController {
@@ -23,7 +23,8 @@ export class FilesController {
       // limits: { fileSize: 1000 } // Se pueden poner varias opciones como por ejemplo limitar el tamaño del archivo
       storage: diskStorage({
         // El storage indica donde se va a guardar el archivo. En este caso se indica que es en localmente en el disco.
-        destination: './static/uploads', // ruta donde se va a guardar el archivo.
+        destination: './static/products', // ruta donde se va a guardar el archivo.
+        filename: fileNamer,
       }),
     }),
   )
