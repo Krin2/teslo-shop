@@ -1,7 +1,10 @@
 import {
   BadRequestException,
   Controller,
+  Get,
+  Param,
   Post,
+  Res,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -9,6 +12,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { FilesService } from './files.service';
 import { fileFilter, fileNamer } from './helpers';
+import { Response } from 'express';
 
 @Controller('files')
 export class FilesController {
@@ -35,6 +39,19 @@ export class FilesController {
     if (!file) {
       throw new BadRequestException(`File not provided`);
     }
-    return file.originalname;
+
+    const secureUrl = file.filename;
+
+    return secureUrl;
+  }
+
+  @Get('product/:imageName')
+  findProductImage(
+    @Param('imageName') imageName: string,
+    @Res() res: Response, // Este decorador indica a nest que la respuesta la vamos a emitir manualmente, con lo cual el return no sirve para devolver la respuesta, se debe usar res.<respuesta>
+  ) {
+    const path = this.filesService.getStaticProductImage(imageName); // si el path no existe se corta la ejecucion con un error
+
+    res.sendFile(path); // Devuelvo la imagen. (notar que no hay visibilidad de la ruta dentro del ṕroyecto).
   }
 }
