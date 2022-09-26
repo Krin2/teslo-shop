@@ -13,10 +13,14 @@ import { diskStorage } from 'multer';
 import { FilesService } from './files.service';
 import { fileFilter, fileNamer } from './helpers';
 import { Response } from 'express';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('files')
 export class FilesController {
-  constructor(private readonly filesService: FilesService) {}
+  constructor(
+    private readonly filesService: FilesService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Post('product')
   // El UseInterceptor, intercepta la solicitud y puede modificar el contenido. Se puede usar a nivel controlador y intercepta todas las solicitudes de la clase.
@@ -40,7 +44,9 @@ export class FilesController {
       throw new BadRequestException(`File not provided`);
     }
 
-    const secureUrl = file.filename;
+    const secureUrl = `${this.configService.get('HOST_API')}/files/products/${
+      file.filename
+    }`;
 
     return secureUrl;
   }
