@@ -1,8 +1,10 @@
+import { User } from '../../auth/entities/user.entity';
 import {
   BeforeInsert,
   BeforeUpdate,
   Column,
   Entity,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -71,6 +73,11 @@ export class Product {
     eager: true, // ver documentacion de typeorm. Hace que el findOne tome las relaciones al usar find*. Para query no sirve
   })
   images?: ProductImage[];
+
+  @ManyToOne(() => User, (user) => user.products, {
+    eager: true, // ver documentacion de typeorm. Hace que el findOne tome las relaciones al usar find*. Para query no sirve
+  })
+  user: User;
 
   @BeforeInsert()
   checkSlugInsert() {
