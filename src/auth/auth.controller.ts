@@ -9,7 +9,7 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { IncomingHttpHeaders } from 'http2';
 import { AuthService } from './auth.service';
-import { GetHeader, GetUser, RoleProtected } from './decorators';
+import { Auth, GetHeader, GetUser, RoleProtected } from './decorators';
 import { CreateUserDto, LoginUserDto } from './dto';
 import { User } from './entities/user.entity';
 import { UserRolesGuard } from './guards/user-roles.guard';
@@ -29,6 +29,7 @@ export class AuthController {
     return this.authService.login(loginUserDto);
   }
 
+  //Endpoint usando decoradores personalizados para validar los argumentos
   @Get('private')
   @UseGuards(AuthGuard()) //esta linea especifica el uso de un guard para validar el ingreso a esta ruta
   testingPrivateRoutes(
@@ -47,11 +48,23 @@ export class AuthController {
     };
   }
 
+  // Endpoint usando decoradores personalizados para validar el rol del usuario mediante el uso de metadata.
   @Get('private2')
   // @SetMetadata('roles', ['admin', 'super-user'])
   @RoleProtected(ValidRoles.superUser, ValidRoles.user, ValidRoles.admin)
   @UseGuards(AuthGuard(), UserRolesGuard) //El UserRolesGuard no usa parentesis porque no queremos generar una ueva instancia sino que queremos usar la ya existente creada por el AuthGuard
   testingPrivateRoute2(@GetUser() user: User) {
+    return {
+      ok: true,
+      message: `Entering in a private route`,
+      user,
+    };
+  }
+
+  // Endpoint usando un decorador personalizado que agrupa y contiene otros decoradores
+  @Get('private3')
+  @Auth(ValidRoles.admin, ValidRoles.superUser) // Auth agrupa todos los decoradores anteriores para validar al usuario
+  testingPrivateRoute3(@GetUser() user: User) {
     return {
       ok: true,
       message: `Entering in a private route`,
