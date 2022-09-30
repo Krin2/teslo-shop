@@ -6,10 +6,13 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { JwtService } from '@nestjs/jwt';
+
 import { Repository } from 'typeorm';
 import { CreateUserDto, LoginUserDto } from './dto';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
+import { JwtPayload } from './interfaces/jwt-payload.interfaces';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +21,7 @@ export class AuthService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly jwtService: JwtService,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -31,7 +35,10 @@ export class AuthService {
 
       await this.userRepository.save(user);
       delete user.password;
-      return user;
+      return {
+        ...user,
+        token: this.getJwtToken({ email: user.email }),
+      };
     } catch (error) {
       this.handleError(error);
     }
@@ -54,8 +61,21 @@ export class AuthService {
     if (!bcrypt.compareSync(password, user.password)) {
       throw new UnauthorizedException(`Credentials are not valid for password`);
     }
-    return user;
+    return {
+      ...user,
+      token: this.getJwtToken({ email: user.email }),
+    };
   }
+
+  private getJwtToken(jwtPayload: JwtPayload) {
+    const token = this.jwtService.sign(jwtPayload);
+    return token;
+  }
+
+  /**
+   * Manejo de errores
+   * @param error error
+   */
   private handleError(error: any): never {
     if (error.code === '23505') {
       throw new BadRequestException(error.detail);
@@ -63,19 +83,4 @@ export class AuthService {
     this.logger.error(error);
     throw new InternalServerErrorException(`Please check server logs`);
   }
-  // findAll() {
-  //   return `This action returns all user`;
-  // }
-
-  // findOne(id: number) {
-  //   return `This action returns a #${id} user`;
-  // }
-
-  // // update(id: number, updateUserDto: UpdateUserDto) {
-  // //   return `This action updates a #${id} user`;
-  // // }
-
-  // remove(id: number) {
-  //   return `This action removes a #${id} user`;
-  // }
 }
