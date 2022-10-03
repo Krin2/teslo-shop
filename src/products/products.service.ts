@@ -14,6 +14,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
 import { validate as isUUID } from 'uuid';
 import { ProductImage } from './entities';
+import { User } from '../auth/entities/user.entity';
 
 @Injectable()
 export class ProductsService {
@@ -31,7 +32,7 @@ export class ProductsService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async create(createProductDto: CreateProductDto) {
+  async create(createProductDto: CreateProductDto, user: User) {
     try {
       const { images = [], ...productDetails } = createProductDto;
       const product = await this.productsRepository.create({
@@ -39,6 +40,7 @@ export class ProductsService {
         images: images.map((image) => {
           return this.productImageRepository.create({ url: image });
         }),
+        user,
       }); // Al crear el producto, si tiene imagenes las agrega a la tabla de imagenes y genera el link entre ambos
       await this.productsRepository.save(product); // guarda el producto en la base de datos (se conecta con la db)
       return { ...product, images };
@@ -100,7 +102,7 @@ export class ProductsService {
     };
   }
 
-  async update(id: string, updateProductDto: UpdateProductDto) {
+  async update(id: string, updateProductDto: UpdateProductDto, user: User) {
     // El preload busca en la tabla un producto que coincida con el id y le copia encima los datos del updateProductDto
     const { images, ...restToUpdate } = updateProductDto;
 
@@ -129,6 +131,8 @@ export class ProductsService {
           this.productImageRepository.create({ url: image }),
         );
       }
+
+      product.user = user;
 
       // Aca guardo los datos en la base de datos, reemplaza el save de abajo
       await queryRunner.manager.save(product);
