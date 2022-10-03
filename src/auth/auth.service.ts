@@ -72,6 +72,14 @@ export class AuthService {
     return token;
   }
 
+  // Verifica que el usuario este autenticado y genera un nuevo token
+  checkoutStatus(user: User) {
+    return {
+      ...user,
+      token: this.getJwtToken({ id: user.id }),
+    };
+  }
+
   /**
    * Manejo de errores
    * @param error error

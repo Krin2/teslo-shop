@@ -29,6 +29,12 @@ export class AuthController {
     return this.authService.login(loginUserDto);
   }
 
+  @Get('check-status')
+  @Auth()
+  checkoutStatus(@GetUser() user: User) {
+    return this.authService.checkoutStatus(user);
+  }
+
   //Endpoint usando decoradores personalizados para validar los argumentos
   @Get('private')
   @UseGuards(AuthGuard()) //esta linea especifica el uso de un guard para validar el ingreso a esta ruta
