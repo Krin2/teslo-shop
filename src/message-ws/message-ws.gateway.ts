@@ -23,6 +23,10 @@ export class MessageWsGateway
 
   // estas interfaces (provenientes de: OnGatewayConnection y OnGatewayDisconnect) me permiten saber cuando alguien se conecta o desconecta del namespace
   handleConnection(client: Socket) {
+    // este debe ser el mismo que se definio en los headers en la aplicacion cliente
+    const token = client.handshake.headers.authentication as string;
+    console.log({ token });
+
     // cada socket tiene un id unico. El mismo cambiara cuando el cliente se desconecte y vuelva a conectarse
     // console.log('Cliente conectado', client.id);
     this.messageWsService.registerClient(client);
