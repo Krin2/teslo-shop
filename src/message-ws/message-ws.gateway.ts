@@ -46,6 +46,22 @@ export class MessageWsGateway
   // Nest provee este decorador que sirve para escuchar un evento
   @SubscribeMessage('message-from-client')
   handleMessageFromClient(client: Socket, payload: NewMessageDto) {
-    console.log(client.id, payload);
+    // // emite unicamente al cliente
+    // client.emit('message-from-server', {
+    //   fullName: 'Marcos',
+    //   message: payload.message || 'nothing',
+    // });
+
+    // // emite a todos menos al cliente inicial
+    // client.broadcast.emit('message-from-server', {
+    //   fullName: `${client.id}: `,
+    //   message: payload.message || 'nothing',
+    // });
+
+    // Emite a todos incluyendo al cliente inicial
+    this.wss.emit('message-from-server', {
+      fullName: `${client.id}: `,
+      message: payload.message || 'nothing',
+    });
   }
 }
