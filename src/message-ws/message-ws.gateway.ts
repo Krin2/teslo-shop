@@ -1,10 +1,12 @@
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
+  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { NewMessageDto } from './dtos/new-message.dto';
 import { MessageWsService } from './message-ws.service';
 
 // El WebSocketGateway actua como un Controlador
@@ -39,5 +41,11 @@ export class MessageWsGateway
       'clients-updated',
       this.messageWsService.getConnectedClients(),
     );
+  }
+
+  // Nest provee este decorador que sirve para escuchar un evento
+  @SubscribeMessage('message-from-client')
+  handleMessageFromClient(client: Socket, payload: NewMessageDto) {
+    console.log(client.id, payload);
   }
 }
