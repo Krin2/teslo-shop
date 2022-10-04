@@ -1,3 +1,4 @@
+import { JwtService } from '@nestjs/jwt';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -8,6 +9,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { NewMessageDto } from './dtos/new-message.dto';
 import { MessageWsService } from './message-ws.service';
+import { JwtPayload } from '../auth/interfaces/jwt-payload.interfaces';
 
 // El WebSocketGateway actua como un Controlador
 // En este punto la conexion ya esta andando. se puede verificar obteniendo una respuesta de:
@@ -19,13 +21,24 @@ export class MessageWsGateway
 {
   @WebSocketServer() wss: Server; // genera una instancia del websocket server. wss tiene la info de todos los clientes conectados
 
-  constructor(private readonly messageWsService: MessageWsService) {}
+  constructor(
+    private readonly messageWsService: MessageWsService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   // estas interfaces (provenientes de: OnGatewayConnection y OnGatewayDisconnect) me permiten saber cuando alguien se conecta o desconecta del namespace
   handleConnection(client: Socket) {
     // este debe ser el mismo que se definio en los headers en la aplicacion cliente
     const token = client.handshake.headers.authentication as string;
-    console.log({ token });
+    let payload: JwtPayload;
+
+    try {
+      payload = this.jwtService.verify(token);
+    } catch (error) {
+      client.disconnect(); // En el caso que no se verifique el token, desconecto al usuario
+      return;
+    }
+    console.log(payload);
 
     // cada socket tiene un id unico. El mismo cambiara cuando el cliente se desconecte y vuelva a conectarse
     // console.log('Cliente conectado', client.id);
