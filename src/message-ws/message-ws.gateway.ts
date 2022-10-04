@@ -27,22 +27,23 @@ export class MessageWsGateway
   ) {}
 
   // estas interfaces (provenientes de: OnGatewayConnection y OnGatewayDisconnect) me permiten saber cuando alguien se conecta o desconecta del namespace
-  handleConnection(client: Socket) {
+  async handleConnection(client: Socket) {
     // este debe ser el mismo que se definio en los headers en la aplicacion cliente
     const token = client.handshake.headers.authentication as string;
+    // El payload el el que definimos en la interfaz de autenticacion. En este caso solo trae el id del usuario pero podria traer muchas cosas mas.
     let payload: JwtPayload;
 
     try {
       payload = this.jwtService.verify(token);
+      await this.messageWsService.registerClient(client, payload.id);
     } catch (error) {
       client.disconnect(); // En el caso que no se verifique el token, desconecto al usuario
       return;
     }
-    console.log(payload);
+    // console.log(payload);
 
     // cada socket tiene un id unico. El mismo cambiara cuando el cliente se desconecte y vuelva a conectarse
     // console.log('Cliente conectado', client.id);
-    this.messageWsService.registerClient(client);
 
     // Este emit, da la informacion de los clientes conectados, por medio del evento "client-updated" a todos los clientes conectados(wss)
     this.wss.emit(
@@ -77,7 +78,7 @@ export class MessageWsGateway
 
     // Emite a todos incluyendo al cliente inicial
     this.wss.emit('message-from-server', {
-      fullName: `${client.id}: `,
+      fullName: `${this.messageWsService.getUserFullName(client.id)}: `,
       message: payload.message || 'nothing',
     });
   }
