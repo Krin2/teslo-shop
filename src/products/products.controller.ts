@@ -43,7 +43,6 @@ export class ProductsController {
   @Get()
   // no hay restriccion de acceso para ver los productos
   findAll(@Query() paginationDto: PaginationDto) {
-    console.log(paginationDto);
     return this.productsService.findAll(paginationDto);
   }
 
