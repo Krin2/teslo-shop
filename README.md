@@ -14,7 +14,7 @@ docker-compose up -d
 ```
 6. Levantar el ambiente de desarrollo con 
   ```
-  yarn start:development
+  yarn start:dev
   ```
 7. Ejecutad SEED
 ```
